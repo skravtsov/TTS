@@ -41,10 +41,8 @@ def df_action( action):
         params = lang_en
 
 
-
-
 df = DF_intents("vark-6785b", "vark-1", df_action, debug=True)
-
+tts = GTTS()
 
 
 
@@ -110,6 +108,8 @@ def main():
     CHUNK = int(RATE / 10)  # 100ms
     client = speech.SpeechClient()
 
+    tts.speak("Okay, let me open stream!")
+
     while(True): #loop with streams
         try:
             language_code = params.locale  # a BCP-47 language tag
@@ -136,6 +136,7 @@ def main():
                 responses = client.streaming_recognize(streaming_config, requests)
 
                 # Now, put the transcription responses to use.
+                tts.speak("I'm ready. Say something!")
                 listen_print_loop(responses)
         except OutOfRange:
             print("Stream restart")
