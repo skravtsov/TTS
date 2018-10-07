@@ -13,12 +13,12 @@ class GTTS():
 
 
     # Set the text input to be synthesized
-    def speak(text):
+    def speak(self,text):
         synthesis_input = texttospeech.types.SynthesisInput(text=text)
 
         # voice gender ("neutral")
         voice = texttospeech.types.VoiceSelectionParams(
-            language_code="en-US"
+            language_code="en-US",
         ssml_gender = texttospeech.enums.SsmlVoiceGender.NEUTRAL)
 
         # Select the type of audio file you want returned

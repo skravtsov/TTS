@@ -1,3 +1,6 @@
+import pyaudio
+from six.moves import queue
+
 
 class MicrophoneStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
