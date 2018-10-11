@@ -20,15 +20,16 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + "/Vark-4c05c8d4b9c7
 
 class ListenLoop:
 
-    def __init__(self, project_id, df_action, lang,  rate=16000, start_phrase="I'm ready! Talk to me"):
+    def __init__(self, project_id, df_action, lang,  rate=16000):
 
         self.RATE = rate
         self.CHUNK = int(rate / 10)  # 100ms
         self.client = speech.SpeechClient()
-        self.start_phrase = start_phrase
+
         self.tts = GTTS()
         self.lang = lang
         self.df = DF_intents(project_id, project_id + "1", df_action, debug=True)
+        self.stream = object()
 
     def listen_loop(self,responses):
         """Iterates through server responses and prints them.
@@ -95,50 +96,62 @@ class ListenLoop:
                 config=config,
                 interim_results=True)
 
-            with MicrophoneStream(self.RATE, self.CHUNK) as stream:
-                audio_generator = stream.generator()
+            with MicrophoneStream(self.RATE, self.CHUNK) as self.stream:
+                audio_generator = self.stream.generator()
                 requests = (types.StreamingRecognizeRequest(audio_content=content)
                             for content in audio_generator)
 
                 responses = self.client.streaming_recognize(streaming_config, requests)
 
                 # Now, put the transcription responses to use.
-                self.tts.speak(self.start_phrase)
+                self.tts.speak(self.lang.start_phrase)
                 self.listen_loop(responses)
 
         except OutOfRange:
             print("Stream restart")
 
+    def change_lang(self, lang):
+        self.lang = lang
+        self.stream.stop()
+
 
 class LangParams:
-    def __init__(self, lang, locale, phrases):
+    def __init__(self, lang, locale, phrases, start_phrase):
         self.lang = lang
         self.locale = locale
         self.phrases = phrases
+        self.start_phrase = start_phrase
 
 
-lang_en = LangParams("en", "en-US", ["Wark", "Vark listen to me", "ukrainska",
-                                     "ukrajinska", "ukraine", "find box"
-                                                              "find the box", "find the bottle",
-                                     "find bottle"])
-lang_ua = LangParams("uk", "uk-UA", ["Варк", "Шукай бутилку", "шукай коробку", "Варк, шукай бутилку"])
+lang_en = LangParams("en", "en-US",
+                     phrases = ["Wark", "Vark listen to me",
+                      "ukrainska", "ukrajinska", "ukraine",
+                      "find box", "find the box", "find the bottle","find bottle"],
+                     start_phrase = "I'm ready! Talk to me"
+                     )
+lang_ua = LangParams("uk", "uk-UA",
+                     phrases= ["Варк",
+                               "Шукай бутилку", "шукай коробку", "Варк, шукай бутилку"],
+                     start_phrase= "Ja gottov dopomohty")
+
+
+
 
 
 
 def df_action(action):
     if (action == "lang_ua"):
-        params = lang_ua
+        listen.change_lang(lang_ua)
         # raise OutOfRange('Restart stream!')
     if (action == "lang_en"):
-        params = lang_en
-
+        listen.change_lang(lang_en)
 
 
 listen =  ListenLoop(rate=16000,
                      project_id="vark-6785b",
                      df_action = df_action,
-                     lang = lang_en,
-                     start_phrase="I'm ready! Talk to me")
+                     lang = lang_ua,
+                     )
 
 while(True):
     listen.run()
