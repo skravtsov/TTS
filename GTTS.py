@@ -27,7 +27,7 @@ class GTTS():
 
         response = self.tts_client.synthesize_speech(synthesis_input, voice, audio_config)
 
-        fname = os.getcwd() + '/tts-temp' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6)) + '.mp3'
+        fname = os.getcwd() + '/tts-temp' + ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6)) + '.mp3'
 
         # The response's audio_content is binary.
         out = open(fname, 'wb')

@@ -4,13 +4,15 @@ from six.moves import queue
 
 class MicrophoneStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
-    def __init__(self, rate, chunk):
+
+    def __init__(self, rate, chunk, device=0):
         self._rate = rate
         self._chunk = chunk
 
         # Create a thread-safe buffer of audio data
         self._buff = queue.Queue()
         self.closed = True
+        self.device = device
 
     def __enter__(self):
         self._audio_interface = pyaudio.PyAudio()
@@ -19,6 +21,7 @@ class MicrophoneStream(object):
             # The API currently only supports 1-channel (mono) audio
             # https://goo.gl/z757pE
             channels=1, rate=self._rate,
+            input_device_index=self.device,
             input=True, frames_per_buffer=self._chunk,
             # Run the audio stream asynchronously to fill the buffer object.
             # This is necessary so that the input device's buffer doesn't
@@ -31,6 +34,15 @@ class MicrophoneStream(object):
         return self
 
     def __exit__(self, type, value, traceback):
+        self._audio_stream.stop_stream()
+        self._audio_stream.close()
+        self.closed = True
+        # Signal the generator to terminate so that the client's
+        # streaming_recognize method will not block the process termination.
+        self._buff.put(None)
+        self._audio_interface.terminate()
+
+    def stop(self):
         self._audio_stream.stop_stream()
         self._audio_stream.close()
         self.closed = True

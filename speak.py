@@ -20,7 +20,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + "/Vark-4c05c8d4b9c7
 
 class ListenLoop:
 
-    def __init__(self, project_id, df_action, lang,  rate=16000):
+    def __init__(self, project_id, df_action, lang,  rate=16000, device = 0):
 
         self.RATE = rate
         self.CHUNK = int(rate / 10)  # 100ms
@@ -30,6 +30,7 @@ class ListenLoop:
         self.lang = lang
         self.df = DF_intents(project_id, project_id + "1", df_action, debug=True)
         self.stream = object()
+        self.device = device
 
     def listen_loop(self,responses):
         """Iterates through server responses and prints them.
@@ -96,7 +97,7 @@ class ListenLoop:
                 config=config,
                 interim_results=True)
 
-            with MicrophoneStream(self.RATE, self.CHUNK) as self.stream:
+            with MicrophoneStream(self.RATE, self.CHUNK, self.device) as self.stream:
                 audio_generator = self.stream.generator()
                 requests = (types.StreamingRecognizeRequest(audio_content=content)
                             for content in audio_generator)
@@ -151,6 +152,7 @@ listen =  ListenLoop(rate=16000,
                      project_id="vark-6785b",
                      df_action = df_action,
                      lang = lang_ua,
+                     device = 0
                      )
 
 while(True):
