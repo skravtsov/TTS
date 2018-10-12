@@ -1,8 +1,10 @@
 from google.cloud import texttospeech
-from playsound import playsound
 import os
 import random
 import string
+import pygame
+
+
 
 
 class GTTS():
@@ -36,5 +38,10 @@ class GTTS():
         #print('Audio content written to file ' + fname)
         out.close()
 
-        playsound(fname, True)
+        pygame.mixer.init()
+        pygame.mixer.music.load(fname)
+        pygame.mixer.music.play()
+        while pygame.mixer.music.get_busy() == True:
+            continue
+        #playsound(fname, True)
         os.remove(fname)

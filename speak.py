@@ -14,16 +14,17 @@ from google.api_core.exceptions import OutOfRange
 from MicrophoneStream import MicrophoneStream
 from GTTS import GTTS
 from dialogflow import DF_intents
+import time
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getcwd() + "/Vark-4c05c8d4b9c7.json"
 
 
 class ListenLoop:
 
-    def __init__(self, project_id, df_action, lang,  rate=16000, device = 0):
+    def __init__(self, project_id, df_action, lang, device=0, rate=16000):
 
-        self.RATE = rate
-        self.CHUNK = int(rate / 10)  # 100ms
+        self.RATE = 48000
+        self.CHUNK = 1024# int(rate / 10)  # 100ms
         self.client = speech.SpeechClient()
 
         self.tts = GTTS()
@@ -110,6 +111,8 @@ class ListenLoop:
 
         except OutOfRange:
             print("Stream restart")
+            self.stream.stop()
+
 
     def change_lang(self, lang):
         self.lang = lang
@@ -151,10 +154,11 @@ def df_action(action):
 listen =  ListenLoop(rate=16000,
                      project_id="vark-6785b",
                      df_action = df_action,
-                     lang = lang_ua,
-                     device = 0
+                     lang = lang_en,
+                     device=2
                      )
 
 while(True):
+    time.sleep(1)
     listen.run()
 

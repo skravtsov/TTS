@@ -4,8 +4,7 @@ from six.moves import queue
 
 class MicrophoneStream(object):
     """Opens a recording stream as a generator yielding the audio chunks."""
-
-    def __init__(self, rate, chunk, device=0):
+    def __init__(self, rate, chunk, device = 0):
         self._rate = rate
         self._chunk = chunk
 
@@ -48,9 +47,8 @@ class MicrophoneStream(object):
         self.closed = True
         # Signal the generator to terminate so that the client's
         # streaming_recognize method will not block the process termination.
-        self._buff.put(None)
-        self._audio_interface.terminate()
-
+        #self._buff.put(None)
+        #self._audio_interface.terminate()
     def _fill_buffer(self, in_data, frame_count, time_info, status_flags):
         """Continuously collect data from the audio stream, into the buffer."""
         self._buff.put(in_data)
