@@ -3,10 +3,16 @@ Python Google TTS and Dialogflow helpers
 
 This class creates Listen Loop - listening user voice, converting to text with Google Cloud STT API, then process with Dialogflow, achieves a feedback and reading with Google Cloud TTS API
 
+Tested on:
+* Windows 10 x64
+* Raspberry Pi 3
+
+
+
 Usage
 -----
 
-'''
+```
 from speak import  LangParams, ListenLoop
 
 
@@ -28,5 +34,4 @@ listen =  ListenLoop(rate=16000,
                      )
 
 while(True):
-    listen.run()
-'''
+```
