@@ -1,5 +1,5 @@
 # Google STT - Dialogflow - Google TTS loop
-Python Google TTS and Dialogflow helpers
+Python Google Speech To Text API to Dialogflow to Google Text To Speech API
 
 This class creates Listen Loop - listening user voice, converting to text with Google Cloud STT API, then process with Dialogflow, achieves a feedback and reading with Google Cloud TTS API
 
@@ -36,4 +36,5 @@ listen =  ListenLoop(rate=16000,
                      )
 
 while(True):
+    listen.run()
 ```
